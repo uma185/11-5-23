@@ -1,0 +1,37 @@
+pipeline{
+    agent any
+  
+
+   tools {
+         maven 'mymaven'
+         }
+    
+    stages{
+        
+        stage('Git Clone'){
+            
+            steps{
+                git branch: 'main', url: 'https://github.com/uma185/11-5-23.git'
+            }
+        }
+         stage('Build'){
+            steps{
+                sh 'mvn install'
+            }
+        }
+        stage('Docker Build'){
+            steps{
+                sh 'docker build -t umagurram/myjavaproject12may .'
+            }
+        }
+        stage('Docker Push'){
+            steps{
+              withCredentials([string(credentialsId: 'docker.hub', variable: 'dockerpush')]) {
+              sh 'docker login -u umagurram -p ${dockerpush}'
+            }
+                 sh 'docker push umagurram/myjavaproject12may'
+            }
+           
+        }
+    }
+}
